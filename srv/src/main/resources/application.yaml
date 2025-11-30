@@ -1,0 +1,90 @@
+---
+spring:
+  config:
+    activate:
+      on-profile: default
+  datasource:
+    url: jdbc:h2:file:./target/h2db;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  liquibase:
+    enabled: false # let Liquibase apply the outbox changesets
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  sql:
+    init:
+      platform: h2
+      mode: always
+cds:
+  security:
+    xsuaa:
+      enabled: true # enable JWT/XSUAA checks
+    mock:
+      enabled: false # enable mock/basic auth completely
+      users:
+        binla:
+          password: binla
+          roles:
+            - MessageViewer
+            - MessageProcessor
+        song:
+          password: song
+          roles:
+            - MessageViewer
+  data-source:
+    auto-config:
+      enabled: true
+  outbox:
+    enabled: false
+  remote:
+    services: # must match the CDS external service name
+      MessageProcessingLogs:
+        destination:
+          name: BTP_CloudIntegration_API
+        type: odata-v2
+      MessageStore:
+        destination:
+          name: BTP_CloudIntegration_API
+        type: odata-v2
+      IntegrationContent:
+        destination:
+          name: BTP_CloudIntegration_API
+        type: odata-v2
+  sql:
+    init: false
+logging:
+  level:
+    # com.sap.cds: INFO
+    # com.sap.cds: DEBUG
+    # com.sap.cds.adapter.odata.v4: TRACE
+    # com.sap.cds.adapter.odata.v4.processors: TRACE
+    # com.sap.cds.integration.cloudsdk: TRACE
+    # com.sap.cds.services: TRACE
+    # com.sap.cds.services.adapters.odata.remote: TRACE
+    # com.sap.cds.services.impl: TRACE
+    # com.sap.cds.services.impl.odata: TRACE
+    # com.sap.cds.services.impl.handlerregistry: TRACE
+    # com.sap.cds.properties: DEBUG
+    # com.sap.cloud.sdk: DEBUG
+    # com.sap.cloud.sdk.cloudplatform.connectivity: DEBUG
+    # com.sap.cloud.sdk.datamodel.odata.client.request: DEBUG
+    com.binlah.sap.btp.cpi.cpi_message_viewer: DEBUG
+    com.binlah.sap.btp.cpi.cpi_message_viewer.cqn: DEBUG
+    com.binlah.sap.btp.cpi.cpi_message_viewer.handlers: DEBUG
+---
+management:
+  endpoint:
+    health:
+      show-components: always
+      probes.enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+  health:
+    defaults.enabled: false
+    ping.enabled: true
+    db.enabled: true

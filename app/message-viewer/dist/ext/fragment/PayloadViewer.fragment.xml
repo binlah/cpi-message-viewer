@@ -1,0 +1,19 @@
+<core:FragmentDefinition
+  xmlns="sap.m"
+  xmlns:core="sap.ui.core"
+  xmlns:code="sap.ui.codeeditor">
+  <VBox id="vbox" width="100%" renderType="Bare" 
+    core:require="{ handler: 'com/binlah/sap/btp/cpi/messageviewer/ext/fragment/PayloadViewerHandler' }">
+    <Toolbar id="toolbar">
+      <Button id="beautifyButton" text="Beautify" press="handler.onBeautifyPressed"/>
+      <Button id="downloadButton" text="Download" press="handler.onDownloadPressed"/>
+    </Toolbar>
+
+    <code:CodeEditor 
+      id="payloadEditor" 
+      type="{blobModel>/editorType}" 
+      value="{blobModel>/payload}" 
+      editable="false" 
+      height="24rem"/>
+  </VBox>
+</core:FragmentDefinition>

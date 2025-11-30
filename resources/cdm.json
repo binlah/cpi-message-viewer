@@ -1,0 +1,75 @@
+[
+    {
+        "_version": "3.0",
+        "identification": {
+            "id": "cpiMessageViewerCatalog",
+            "title": "{{title}}",
+            "entityType": "catalog"
+        },
+        "payload": {
+            "viz": [
+                {
+                    "appId": "com.binlah.sap.btp.cpi.messageviewer",
+                    "vizId": "MessageViewer-display"
+                }
+            ]
+        },
+        "texts": [
+            {
+                "locale": "",
+                "textDictionary": {
+                    "title": "CPI Message Viewer Catalog"
+                }
+            }
+        ]
+    },
+    {
+        "_version": "3.0",
+        "identification": {
+            "id": "cpiMessageViewerGroup",
+            "title": "{{title}}",
+            "entityType": "group"
+        },
+        "payload": {
+            "viz": [
+                {
+                    "appId": "com.binlah.sap.btp.cpi.messageviewer",
+                    "vizId": "MessageViewer-display"
+                }
+            ]
+        },
+        "texts": [
+            {
+                "locale": "",
+                "textDictionary": {
+                    "title": "CPI Message Viewer"
+                }
+            }
+        ]
+    },
+    {
+        "_version": "3.0",
+        "identification": {
+            "id": "cpiMessageViewerRole",
+            "entityType": "role",
+            "title": "CPI Message Viewer Role"
+        },
+        "payload": {
+            "apps": [
+                {
+                    "id": "com.binlah.sap.btp.cpi.messageviewer"
+                }
+            ],
+            "catalogs": [
+                {
+                    "id": "cpiMessageViewerCatalog"
+                }
+            ],
+            "groups": [
+                {
+                    "id": "cpiMessageViewerGroup"
+                }
+            ]
+        }
+    }
+]

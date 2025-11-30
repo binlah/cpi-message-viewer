@@ -1,0 +1,21 @@
+{
+  "xsappname": "cpi-message-viewer",
+  "tenant-mode": "dedicated",
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.MessageViewer",
+      "description": "MessageViewer"
+    }
+  ],
+  "attributes": [],
+  "role-templates": [
+    {
+      "name": "MessageViewer",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.MessageViewer"
+      ],
+      "attribute-references": []
+    }
+  ]
+}

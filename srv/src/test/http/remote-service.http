@@ -1,0 +1,32 @@
+# In the following requests the variable baseUrl is used.
+# Its value is set here.
+
+### ----------------------------------------------------------------------------------------------------------------
+
+# CDS Home : work
+GET {{$dotenv cap_url}}
+
+### List odata services : work
+GET {{$dotenv cap_odata_v4_url}}/remote/$metadata
+### -------------------------------------------- MessageProcessingLogs --------------------------------------------
+
+### List All MessageProcessingLogs : correct
+GET {{$dotenv cap_odata_v4_url}}/remote/MessageProcessingLogs
+
+### List MessageProcessingLogs with $top : correct
+GET {{$dotenv cap_odata_v4_url}}/remote/MessageProcessingLogs?$count=true&$top=0
+
+### List MessageProcessingLogs with $count : translate to $inlinecount=allpages
+GET {{$dotenv cap_odata_v4_url}}/remote/MessageProcessingLogs?$count=true
+
+### List MessageProcessingLogs with $top : correct
+GET {{$dotenv cap_odata_v4_url}}/remote/MessageProcessingLogs?$top=3
+
+### List MessageProcessingLogs with $top and $orderby : correct
+GET {{$dotenv cap_odata_v4_url}}/remote/MessageProcessingLogs?$top=3&$orderby=LogStart asc
+
+### List MessageProcessingLogs with $select some fields : correct
+GET {{$dotenv cap_odata_v4_url}}/remote/MessageProcessingLogs?$select=MessageGuid,Status,CustomStatus,LogStart
+
+### List MessageProcessingLogs with $top and $select some fields : correct
+GET {{$dotenv cap_odata_v4_url}}/remote/MessageProcessingLogs?$top=3&$select=MessageGuid,Status,CustomStatus,LogStart

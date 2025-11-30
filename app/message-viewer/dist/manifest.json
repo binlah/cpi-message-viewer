@@ -1,0 +1,270 @@
+{
+	"_version": "1.60.0",
+	"sap.app": {
+		"id": "com.binlah.sap.btp.cpi.messageviewer",
+		"type": "application",
+		"i18n": {
+			"bundleUrl": "i18n/i18n.properties",
+			"supportedLocales": [
+				""
+			]
+		},
+		"applicationVersion": {
+			"version": "0.0.1"
+		},
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"resources": "resources.json",
+		"sourceTemplate": {
+			"id": "@sap/generator-fiori:lrop",
+			"version": "1.19.0",
+			"toolsId": "0be2d84a-39f3-4a8e-a458-ec7dd0d1ea37"
+		},
+		"dataSources": {
+			"mainService": {
+				"uri": "odata/v4/remote/",
+				"type": "OData",
+				"settings": {
+					"annotations": [],
+					"odataVersion": "4.0"
+				}
+			}
+		},
+		"crossNavigation": {
+			"inbounds": {
+				"MessageViewer-display": {
+					"semanticObject": "MessageViewer",
+					"action": "display",
+					"title": "{{MessageViewer-display.flpTitle}}",
+					"signature": {
+						"parameters": {},
+						"additionalParameters": "allowed"
+					}
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "",
+			"favIcon": "",
+			"phone": "",
+			"phone@2": "",
+			"tablet": "",
+			"tablet@2": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"flexEnabled": true,
+		"dependencies": {
+			"minUI5Version": "1.120.38",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {},
+				"sap.fe.templates": {},
+				"sap.f": {},
+				"sap.ui.codeeditor": {}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "com.binlah.sap.btp.cpi.messageviewer.i18n.i18n",
+					"supportedLocales": [
+						""
+					]
+				}
+			},
+			"": {
+				"dataSource": "mainService",
+				"preload": true,
+				"settings": {
+					"operationMode": "Server",
+					"autoExpandSelect": true,
+					"earlyRequests": true
+				}
+			},
+			"@i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"uri": "i18n/i18n.properties",
+				"settings": {
+					"supportedLocales": [
+						""
+					]
+				}
+			}
+		},
+		"resources": {
+			"css": []
+		},
+		"routing": {
+			"config": {
+				"flexibleColumnLayout": {
+					"defaultTwoColumnLayoutType": "TwoColumnsMidExpanded",
+					"defaultThreeColumnLayoutType": "ThreeColumnsEndExpanded"
+				},
+				"routerClass": "sap.f.routing.Router"
+			},
+			"routes": [
+				{
+					"pattern": ":?query:",
+					"name": "MessageProcessingLogsList",
+					"target": [
+						"MessageProcessingLogsList"
+					]
+				},
+				{
+					"pattern": "MessageProcessingLogs({key}):?query:",
+					"name": "MessageProcessingLogsObjectPage",
+					"target": [
+						"MessageProcessingLogsList",
+						"MessageProcessingLogsObjectPage"
+					]
+				},
+				{
+					"pattern": "MessageProcessingLogs({key})/MessageStoreEntries({key2}):?query:",
+					"name": "MessageStoreEntriesObjectPage",
+					"target": [
+						"MessageProcessingLogsList",
+						"MessageProcessingLogsObjectPage",
+						"MessageStoreEntriesObjectPage"
+					]
+				}
+			],
+			"targets": {
+				"MessageProcessingLogsList": {
+					"type": "Component",
+					"id": "MessageProcessingLogsList",
+					"name": "sap.fe.templates.ListReport",
+					"options": {
+						"settings": {
+							"contextPath": "/MessageProcessingLogs",
+							"variantManagement": "Page",
+							"navigation": {
+								"MessageProcessingLogs": {
+									"detail": {
+										"route": "MessageProcessingLogsObjectPage"
+									}
+								}
+							},
+							"controlConfiguration": {
+								"@com.sap.vocabularies.UI.v1.LineItem": {
+									"tableSettings": {
+										"type": "ResponsiveTable"
+									}
+								}
+							}
+						}
+					},
+					"controlAggregation": "beginColumnPages",
+					"contextPattern": ""
+				},
+				"MessageProcessingLogsObjectPage": {
+					"type": "Component",
+					"id": "MessageProcessingLogsObjectPage",
+					"name": "sap.fe.templates.ObjectPage",
+					"options": {
+						"settings": {
+							"editableHeaderContent": false,
+							"contextPath": "/MessageProcessingLogs",
+							"navigation": {
+								"MessageStoreEntries": {
+									"detail": {
+										"route": "MessageStoreEntriesObjectPage"
+									}
+								}
+							},
+							"controlConfiguration": {
+								"CustomHeaderProperties/@com.sap.vocabularies.UI.v1.LineItem#CustomerHeaders": {
+									"tableSettings": {
+										"quickVariantSelection": {
+											"showCounts": false
+										},
+										"personalization": {
+											"filter": false
+										},
+										"enableExport": false,
+										"showSearch": false
+									}
+								},
+								"MessageStoreEntries/@com.sap.vocabularies.UI.v1.LineItem#MessageStoreEntries": {
+									"tableSettings": {
+										"personalization": {
+											"filter": false,
+											"sort": false
+										},
+										"quickVariantSelection": {
+											"showCounts": false
+										},
+										"enableExport": false,
+										"showSearch": false
+									}
+								}
+							}
+						}
+					},
+					"controlAggregation": "midColumnPages",
+					"contextPattern": "/MessageProcessingLogs({key})"
+				},
+				"MessageStoreEntriesObjectPage": {
+					"type": "Component",
+					"id": "MessageStoreEntriesObjectPage",
+					"name": "sap.fe.templates.ObjectPage",
+					"options": {
+						"settings": {
+							"editableHeaderContent": false,
+							"contextPath": "/MessageProcessingLogs/MessageStoreEntries",
+							"content": {
+								"body": {
+									"sections": {
+										"PayloadViewer": {
+											"template": "com.binlah.sap.btp.cpi.messageviewer.ext.fragment.PayloadViewer",
+											"title": "{i18n>payloadViewer}"
+										}
+									}
+								}
+							}
+						}
+					},
+					"controlAggregation": "endColumnPages",
+					"contextPattern": "/MessageProcessingLogs({key})/MessageStoreEntries({key2})"
+				}
+			}
+		},
+		"extends": {
+			"extensions": {
+				"sap.ui.controllerExtensions": {
+					"sap.fe.templates.ObjectPage.ObjectPageController#com.binlah.sap.btp.cpi.messageviewer::MessageStoreEntriesObjectPage": {
+						"controllerName": "com.binlah.sap.btp.cpi.messageviewer.ext.controller.PayloadViewer"
+					}
+				}
+			}
+		},
+		"rootView": {
+			"viewName": "sap.fe.templates.RootContainer.view.Fcl",
+			"type": "XML",
+			"async": true,
+			"id": "appRootView"
+		},
+		"flexBundle": false
+	},
+	"sap.fiori": {
+		"registrationIds": [],
+		"archeType": "transactional"
+	},
+	"sap.cloud": {
+		"public": true,
+		"service": "cpimessageviewer.service"
+	}
+}

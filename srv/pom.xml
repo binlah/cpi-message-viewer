@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<artifactId>cpi-message-viewer-parent</artifactId>
+		<groupId>com.binlah.sap.btp.cpi.cpi_message_viewer</groupId>
+		<version>${revision}</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<artifactId>cpi-message-viewer</artifactId>
+	<packaging>jar</packaging>
+
+	<name>cpi-message-viewer</name>
+
+	<!-- ACTUAL DEPENDENCIES -->
+	<dependencies>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+
+		<!-- CDS SPRING BOOT STARTER -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.sap.cds</groupId>
+			<artifactId>cds-starter-spring-boot</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.sap.cds</groupId>
+			<artifactId>cds-adapter-odata-v4</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		
+		<!-- Enable CAP remote OData (V2/V4) via Cloud SDK -->
+		
+		<dependency>
+			<groupId>com.sap.cds</groupId>
+			<artifactId>cds-feature-remote-odata</artifactId>
+			<version>${cds.services.version}</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sap.cds</groupId>
+			<artifactId>cds-starter-cloudfoundry</artifactId>
+			<version>${cds.services.version}</version>
+		</dependency>
+
+		<!-- ===== SAP Cloud SDK v5 (Java 21 friendly) ===== -->
+		<!-- Untyped OData client (gives ODataQueryBuilder & friends) -->
+		<dependency>
+			<groupId>com.sap.cloud.sdk.datamodel</groupId>
+			<artifactId>odata-client</artifactId>
+		</dependency>
+		<!-- OData core for batch operations -->
+		<dependency>
+			<groupId>com.sap.cloud.sdk.datamodel</groupId>
+			<artifactId>odata-core</artifactId>
+		</dependency>
+		
+		<!-- DestinationAccessor & HTTP connectivity (CF) -->
+		<dependency>
+			<groupId>com.sap.cloud.sdk.cloudplatform</groupId>
+			<artifactId>cloudplatform-connectivity</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.sap.cloud.sdk.cloudplatform</groupId>
+			<artifactId>cloudplatform-connectivity-scp-cf</artifactId>
+		</dependency>
+		<!-- (optional but handy) CF integration helpers -->
+		<dependency>
+			<groupId>com.sap.cloud.sdk.cloudplatform</groupId>
+			<artifactId>scp-cf</artifactId>
+		</dependency>
+		
+		<!-- Optional: Lombok if you want it (the generator can use it) -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<scope>compile</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.sap.cds</groupId>
+			<artifactId>cds-feature-remote-odata</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+	    
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.codehaus.janino</groupId>
+			<artifactId>janino</artifactId>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<finalName>${project.artifactId}</finalName>
+		<plugins>
+
+			<!-- BUILD HELPER PLUGIN TO ADD GENERATED SOURCES TO CLASSPATH -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.4.0</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>${project.build.directory}/generated-sources/vdm</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- SPRING BOOT PLUGIN -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring.boot.version}</version>
+				<configuration>
+					<skip>false</skip>
+				</configuration>
+				<executions>
+					<execution>
+						<id>repackage</id>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+						<configuration>
+							<classifier>exec</classifier>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- STEPS TO BUILD CLOUD SDK VDM AND GENERATE POJOs -->
+			<plugin>
+				<groupId>com.sap.cloud.sdk.datamodel</groupId>
+				<artifactId>odata-generator-maven-plugin</artifactId>
+				<version>${cloud.sdk.version}</version>
+				<executions>
+					<execution>
+						<id>generate-cpi-vdm</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputDirectory>${project.basedir}/_edmx</inputDirectory>
+							<outputDirectory>${project.build.directory}/generated-sources/vdm</outputDirectory>
+							<deleteOutputDirectory>true</deleteOutputDirectory>
+							<packageName>com.binlah.sap.cap.vdm</packageName>
+							<defaultBasePath>/api/v1/</defaultBasePath>
+							<!-- make sure we target V2 and disable Lombok -->
+							<useV2>true</useV2>
+							<useLombok>false</useLombok>
+							<includeEntitySets>
+								<includeEntitySet>MessageProcessingLogs</includeEntitySet>
+								<includeEntitySet>MessageProcessingLogCustomHeaderProperties</includeEntitySet>
+								<includeEntitySet>MessageStoreEntries</includeEntitySet>
+								<includeEntitySet>MessageStoreEntryAttachments</includeEntitySet>
+								<includeEntitySet>MessageStoreEntryAttachmentProperties</includeEntitySet>
+								<includeEntitySet>MessageStoreEntryProperties</includeEntitySet>
+								<includeEntitySet>IntegrationRuntimeArtifacts</includeEntitySet>
+								<includeEntitySet>RuntimeArtifactErrorInformations</includeEntitySet>
+							</includeEntitySets>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			
+			<!-- STEPS TO BUILD CDS MODEL AND GENERATE POJOs -->
+			<plugin>
+				<groupId>com.sap.cds</groupId>
+				<artifactId>cds-maven-plugin</artifactId>
+				
+				<!-- NEW: make all cds commands run in CAP root (one level up) -->
+				<configuration>
+					<workingDirectory>${project.basedir}/..</workingDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<id>cds.clean</id>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+					</execution>
+
+					<execution>
+						<id>cds.install-node</id>
+						<goals>
+							<goal>install-node</goal>
+						</goals>
+					</execution>
+
+					<execution>
+						<id>cds.npm-ci</id>
+						<goals>
+							<goal>npm</goal>
+						</goals>
+						<configuration>
+							<arguments>ci</arguments>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>cds.resolve</id>
+						<goals>
+							<goal>resolve</goal>
+						</goals>
+					</execution>
+
+					<execution>
+						<id>cds.build</id>
+						<goals>
+							<goal>cds</goal>
+						</goals>
+						<configuration>
+							<commands>
+								<command>build --for java</command>
+							</commands>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>cds.generate</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<basePackage>cds.gen</basePackage>
+							<betterNames>true</betterNames>
+							<cqnServiceGetters>true</cqnServiceGetters>
+							<linkedInterfaces>true</linkedInterfaces>
+							<interfacesForAspects>true</interfacesForAspects>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

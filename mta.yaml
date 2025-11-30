@@ -1,0 +1,218 @@
+_schema-version: 3.3.0
+ID: cpi-message-viewer
+version: 1.0.0-SNAPSHOT
+description: "A CPI Message Viewer project."
+parameters:
+  enable-parallel-deployments: true
+  deploy_mode: html5-repo
+  subdomain: ~
+  srv-no-route: ~
+modules:
+  - name: cpi-message-viewer-srv
+    type: java
+    path: srv
+    parameters:
+      instances: 1
+      buildpack: sap_java_buildpack_jakarta
+      disk-quota: 512M
+      memory: 512M
+      # no-route: ${srv-no-route} # uncomment to disable route creation for trial accounts
+    properties:
+      SPRING_PROFILES_ACTIVE: cloud,sandbox
+      JBP_CONFIG_COMPONENTS: "jres: ['com.sap.xs.java.buildpack.jre.SAPMachineJRE']"
+      JBP_CONFIG_SAP_MACHINE_JRE: "{ version: 21.+ }"
+    build-parameters:
+      builder: custom
+      commands:
+        - mvn clean package -DskipTests=true --batch-mode
+      build-result: target/*-exec.jar
+    provides:
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: cpi-message-viewer-auth
+      - name: cpi-message-viewer-destination
+
+  - name: cpi-message-viewer-app-deployer
+    type: com.sap.application.content
+    path: .
+    parameters:
+      config:
+        # HTML5Runtime_enabled: true
+        destinations:
+          - forwardAuthToken: true
+            name: cpi-message-viewer-srv-api
+            url: ~{srv-api/srv-url}
+          - name: ui5
+            url: https://ui5.sap.com
+      # no-route: true # uncomment to disable route creation for HTML5 app
+    requires:
+      - name: srv-api
+      - name: cpi-message-viewer-auth
+      - name: cpi-message-viewer-destination # missing param
+      - name: cpi-message-viewer-html5-repo-host
+        parameters:
+          content-target: true
+          # config:
+          #   HTML5Runtime_enabled: true
+    build-parameters:
+      build-result: resources/
+      requires:
+        - name: cpi-message-viewer-cdm
+          artifacts:
+            - cdm.json
+          target-path: resources/
+        - name: cpimessageviewermessageviewer
+          artifacts:
+            - message-viewer.zip
+          target-path: resources/
+
+  - name: cpi-message-viewer-cdm
+    type: com.sap.application.content
+    path: workzone # folder where cdm.json lives
+    build-parameters:
+      no-source: true
+
+  - name: cpimessageviewermessageviewer
+    type: html5
+    path: app/message-viewer
+    build-parameters:
+      build-result: dist
+      builder: custom
+      commands:
+        - npm ci
+        - npm run build
+      supported-platforms: []
+    parameters:
+      no-route: true
+
+  - name: cpi-message-viewer-destinations
+    type: com.sap.application.content
+    requires:
+      - name: cpi-message-viewer-html5-runtime
+        parameters:
+          service-key:
+            name: cpi-message-viewer-html5-runtime-service-key
+      - name: cpi-message-viewer-auth
+        parameters:
+          service-key:
+            name: cpi-message-viewer-auth-key
+      - name: cpi-message-viewer-html5-repo-host
+        parameters:
+          service-key:
+            name: cpi-message-viewer-html5-repo-host-key
+      - name: srv-api
+      - name: cpi-message-viewer-destination
+        parameters:
+          content-target: true
+    build-parameters:
+      no-source: true
+    parameters:
+      content:
+        subaccount:
+          existing_destinations_policy: update
+          destinations:
+            # # ----------------------------------------------------
+            # # 1) CDM DESIGN-TIME DESTINATION
+            # # ----------------------------------------------------
+            - Name: cpi-message-viewer-cdm
+              # Authentication: OAuth2ClientCredentials
+              # ProxyType: Internet
+              # Type: HTTP
+              ServiceInstanceName: cpi-message-viewer-html5-runtime-service
+              ServiceKeyName: cpi-message-viewer-html5-runtime-service-key
+              URL: https://html5-apps-repo-rt.${default-domain}/applications/cdm/cpimessageviewer.service
+        instance:
+          existing_destinations_policy: update
+          destinations:
+            - Name: cpi-message-viewer-html5-repository
+              ServiceInstanceName: cpi-message-viewer-html5-repo-host
+              ServiceKeyName: cpi-message-viewer-html5-repo-host-key
+              sap.cloud.service: cpimessageviewer.service
+            - Name: cpi-message-viewer-auth
+              Authentication: OAuth2UserTokenExchange
+              ServiceInstanceName: cpi-message-viewer-auth
+              ServiceKeyName: cpi-message-viewer-auth-key
+              sap.cloud.service: cpimessageviewer.service
+
+resources:
+  - name: cpi-message-viewer-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+      # mta externalized parameters
+      btp-api-url: ~
+      btp-api-client-id: ~
+      btp-api-client-secret: ~
+      btp-api-token-url: ~
+      config:
+        HTML5Runtime_enabled: true
+        init_data:
+          subaccount:
+            existing_destinations_policy: update
+            destinations:
+              - Name: cpi-message-viewer-rt
+                Authentication: NoAuthentication
+                ProxyType: Internet
+                Type: HTTP
+                URL: https://${subdomain}.launchpad.${default-domain}
+                CEP.HTML5contentprovider: true
+                CEP.idpOrigin: "overwriteIdpOrigin"
+                # HTML5.DynamicDestination: true
+                # HTML5.ForwardAuthToken: true
+          instance:
+            existing_destinations_policy: update
+            destinations:
+              - Name: srv-api
+                URL: ~{srv-api/srv-url}
+                Authentication: NoAuthentication
+                Type: HTTP
+                ProxyType: Internet
+                HTML5.ForwardAuthToken: true
+                HTML5.DynamicDestination: true
+              - Name: BTP_CloudIntegration_API
+                Type: HTTP
+                ProxyType: Internet
+                URL: ${btp-api-url}/api/v1
+                Authentication: OAuth2ClientCredentials
+                clientId: ${btp-api-client-id}
+                clientSecret: ${btp-api-client-secret}
+                tokenServiceURL: ${btp-api-token-url}?grant_type=client_credentials
+                tokenServiceURLType: Dedicated
+    requires:
+      - name: srv-api
+        group: destinations
+        properties:
+          name: srv-api # must be used in xs-app.json as well
+          url: ~{srv-url}
+          forwardAuthToken: true
+
+  - name: cpi-message-viewer-html5-repo-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-host
+
+  - name: cpi-message-viewer-html5-runtime
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-name: cpi-message-viewer-html5-runtime-service
+      service-plan: app-runtime
+
+  - name: cpi-message-viewer-auth
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: cpi-message-viewer
+        tenant-mode: dedicated
+        role-collections:
+          - name: "cpi-message-viewer"
+            description: CPI Message Viewer
+            role-template-references:
+              - $XSAPPNAME.MessageViewer
