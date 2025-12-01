@@ -138,7 +138,7 @@ parameters:
 resources:
   - name: cpi-message-viewer-destination
     parameters:
-      btp-api-url: 'https://{{url-from-service-key-plan-api}}'
+      btp-api-url: '{{url-from-service-key-plan-api}}'
       btp-api-client-id: '{{clientid-from-service-key-plan-api}}'
       btp-api-client-secret: '{{clientsecret-from-service-key-plan-api}}'
       btp-api-token-url: '{{tokenurl-from-service-key-plan-api}}'
