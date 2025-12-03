@@ -68,7 +68,7 @@ public class RemoteServiceHandler implements EventHandler {
     // /Date(1694851200000)/ or /Date(1694851200000+0700)/
     private static final Pattern ODATA_V2_DATE = Pattern.compile("^/Date\\(([-]?\\d+)(?:([+-]\\d{4}))?\\)/$");
 
-    private HttpDestination dest;
+    // private HttpDestination dest;
     private DefaultMessageProcessingLogsService messageProcessingLogsService;
     private DefaultMessageStoreService messageStoreService;
     private DefaultIntegrationContentService integrationContentService;
@@ -83,11 +83,7 @@ public class RemoteServiceHandler implements EventHandler {
 
     private HttpDestination getDestination() {
         logger.info("Starting getDestination");
-        if (this.dest == null) {
-            this.dest = DestinationAccessor.getDestination("BTP_CloudIntegration_API").asHttp();
-        }
-        logger.info("this.dest: {}", this.dest);
-        return this.dest;
+        return DestinationAccessor.getDestination("BTP_CloudIntegration_API").asHttp();
     }
 
     // --------------------------------------------------------------------
