@@ -199,6 +199,11 @@ public class MessageProcessingLogCqnVisitor implements CqnVisitor {
                             ? MessageProcessingLog.CORRELATION_ID.eq(value.toString())
                             : mainFilter.and(MessageProcessingLog.CORRELATION_ID.eq(value.toString()));
 
+                } else if (fieldName.equals("Status")) {
+                    mainFilter = (mainFilter == null)
+                            ? MessageProcessingLog.STATUS.eq(value.toString())
+                            : mainFilter.and(MessageProcessingLog.STATUS.eq(value.toString()));
+
                 } else {
                     parameters.put(fieldName, value);
                 }

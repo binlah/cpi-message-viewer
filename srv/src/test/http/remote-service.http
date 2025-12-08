@@ -30,3 +30,11 @@ GET {{$dotenv cap_odata_v4_url}}/remote/MessageProcessingLogs?$select=MessageGui
 
 ### List MessageProcessingLogs with $top and $select some fields : correct
 GET {{$dotenv cap_odata_v4_url}}/remote/MessageProcessingLogs?$top=3&$select=MessageGuid,Status,CustomStatus,LogStart
+
+### List MessageProcessingLogs with $filter on Status : correct
+GET {{$dotenv cap_odata_v4_url}}/remote/MessageProcessingLogs?$filter=Status eq 'FAILED'
+Authorization: Basic binla:binla
+
+### List MessageProcessingLogs with $$filter on CustomStatus : correct
+GET {{$dotenv cap_odata_v4_url}}/remote/MessageProcessingLogs?$filter=CustomStatus eq 'ERROR_SAP_500'
+Authorization: Basic binla:binla

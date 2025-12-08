@@ -1,4 +1,7 @@
 ---
+# =========================
+# 1) Shared for all profiles
+# =========================
 spring:
   config:
     activate:
@@ -19,21 +22,6 @@ spring:
       platform: h2
       mode: always
 cds:
-  security:
-    xsuaa:
-      enabled: true # enable JWT/XSUAA checks
-    mock:
-      enabled: false # enable mock/basic auth completely
-      users:
-        binla:
-          password: binla
-          roles:
-            - MessageViewer
-            - MessageProcessor
-        song:
-          password: song
-          roles:
-            - MessageViewer
   data-source:
     auto-config:
       enabled: true
@@ -74,7 +62,52 @@ logging:
     com.binlah.sap.btp.cpi.cpi_message_viewer: DEBUG
     com.binlah.sap.btp.cpi.cpi_message_viewer.cqn: DEBUG
     com.binlah.sap.btp.cpi.cpi_message_viewer.handlers: DEBUG
+
 ---
+# =========================
+# 2) LOCAL profile: mock security
+# =========================
+spring:
+  config:
+    activate:
+      on-profile: local
+cds:
+  security:
+    xsuaa:
+      enabled: false
+    mock:
+      enabled: true
+      users:
+        binla:
+          password: binla
+          roles:
+            - MessageViewer
+            - MessageProcessor
+        song:
+          password: song
+          roles:
+            - MessageViewer
+
+---
+# =========================
+# 3) CLOUD profile: XSUAA (for BTP)
+# =========================
+spring:
+  config:
+    activate:
+      on-profile: cloud
+
+cds:
+  security:
+    xsuaa:
+      enabled: true
+    mock:
+      enabled: false
+
+---
+# =========================
+# 4) Actuator / health (all profiles)
+# =========================
 management:
   endpoint:
     health:
