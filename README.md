@@ -89,19 +89,36 @@ npm install
 
 ### 3. Local destination (required only for local testing)
 
-Create `/srv/default-env.json`:
+Create `./default-env.json`:
 
 ```json
 {
-  "destinations": [
-    {
-      "name": "BTP_CloudIntegration_API",
-      "url": "https://<your-cpi-host>",
-      "authentication": "BasicAuthentication",
-      "username": "<user>",
-      "password": "<password>"
+    "VCAP_SERVICES": {
+        "destination": [
+            {
+                "label": "destination",
+                "name": "destination-service",
+                "tags": [
+                    "destination"
+                ],
+                "credentials": {
+					        ### copy from destination instance / api service key ###
+                }
+            }
+        ],
+        "xsuaa": [
+            {
+                "label": "xsuaa",
+                "name": "xsuaa-service",
+                "tags": [
+                    "xsuaa"
+                ],
+                "credentials": {
+					        ### copy from xsuaa instance ###
+                }
+            }
+        ]
     }
-  ]
 }
 ```
 
