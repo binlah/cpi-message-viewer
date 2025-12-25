@@ -1,5 +1,9 @@
 # CPI Message Viewer (SAP BTP + SAP Cloud Integration)
+📘 **SAP Community Blog**  
+Learn the background, motivation, and design decisions behind this project:  
+👉 https://community.sap.com/t5/technology-blog-posts-by-members/exploring-cpi-message-store-amp-mpl-made-easy-introducing-my-open-source/ba-p/14280562
 
+---
 SAP Cloud Integration provides a message store for persisted payloads, but—according to SAP’s documentation—there is **no user interface-based option** to view Message Store Entries. Access is only possible via the OData API.
 
 **CPI Message Viewer** fills this gap.
