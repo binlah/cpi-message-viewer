@@ -1,0 +1,31 @@
+# In the following requests the variable $dotenv btp_api_base_url is used.
+# Its value is set here.
+
+### Use access token in next request
+# @name login
+POST {{$dotenv btp_api_token_url}}?grant_type=client_credentials
+Content-Type: application/x-www-form-urlencoded
+
+client_id={{$dotenv btp_api_client_id}}&client_secret={{$dotenv btp_api_client_secret}}
+
+### Store access token in variable
+@access_token = {{login.response.body.access_token}}
+
+# @PackageId = 
+#------------------------------------- IntegrationPackages -------------------------------------
+
+### List All IntegrationPackages
+GET {{$dotenv btp_api_base_url}}/IntegrationPackages?$format=json
+Authorization: Bearer {{access_token}}
+
+### List All IntegrationRuntimeArtifacts
+GET {{$dotenv btp_api_base_url}}/IntegrationRuntimeArtifacts?$format=json
+Authorization: Bearer {{access_token}}
+
+### count MessageProcessingLogs
+GET {{$dotenv btp_api_base_url}}/MessageProcessingLogs/$count
+Authorization: Bearer {{access_token}}
+
+### List All MessageProcessingLogs
+GET {{$dotenv btp_api_base_url}}/MessageProcessingLogs?$format=json
+Authorization: Bearer {{access_token}}

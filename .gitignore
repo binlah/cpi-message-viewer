@@ -40,7 +40,6 @@ srv/src/test/http/.env
 .cpi-message-viewer_mta_build_tmp/cpi-message-viewer/data.zip
 app/message-viewer/dist/message-viewer.zip
 resources/message-viewer.zip
-mta-env-gulf-btp-dev-jjn0jnvr.mtaext
-mta-env-gulf-gedho-btpea-dev-sapcloud.mtaext
+*.mtaext
 ztemp.txt
 mta.mtaext

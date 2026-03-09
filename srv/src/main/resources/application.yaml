@@ -45,23 +45,22 @@ cds:
     init: false
 logging:
   level:
-    # com.sap.cds: INFO
-    # com.sap.cds: DEBUG
-    # com.sap.cds.adapter.odata.v4: TRACE
-    # com.sap.cds.adapter.odata.v4.processors: TRACE
-    # com.sap.cds.integration.cloudsdk: TRACE
-    # com.sap.cds.services: TRACE
-    # com.sap.cds.services.adapters.odata.remote: TRACE
-    # com.sap.cds.services.impl: TRACE
-    # com.sap.cds.services.impl.odata: TRACE
-    # com.sap.cds.services.impl.handlerregistry: TRACE
-    # com.sap.cds.properties: DEBUG
-    # com.sap.cloud.sdk: DEBUG
-    # com.sap.cloud.sdk.cloudplatform.connectivity: DEBUG
-    # com.sap.cloud.sdk.datamodel.odata.client.request: DEBUG
-    com.binlah.sap.btp.cpi.cpi_message_viewer: DEBUG
-    com.binlah.sap.btp.cpi.cpi_message_viewer.cqn: DEBUG
-    com.binlah.sap.btp.cpi.cpi_message_viewer.handlers: DEBUG
+    com.sap.cds: ERROR
+    com.sap.cds.adapter.odata.v4: ERROR
+    com.sap.cds.adapter.odata.v4.processors: ERROR
+    com.sap.cds.integration.cloudsdk: ERROR
+    com.sap.cds.services: ERROR
+    com.sap.cds.services.adapters.odata.remote: ERROR
+    com.sap.cds.services.impl: ERROR
+    com.sap.cds.services.impl.odata: ERROR
+    com.sap.cds.services.impl.handlerregistry: ERROR
+    com.sap.cds.properties: ERROR
+    com.sap.cloud.sdk: ERROR
+    com.sap.cloud.sdk.cloudplatform.connectivity: ERROR
+    com.sap.cloud.sdk.datamodel.odata.client.request: ERROR
+    com.binlah.sap.btp.cpi.cpi_message_viewer: WARN
+    com.binlah.sap.btp.cpi.cpi_message_viewer.cqn: WARN
+    com.binlah.sap.btp.cpi.cpi_message_viewer.handlers: WARN
 
 ---
 # =========================
@@ -95,7 +94,7 @@ cds:
 spring:
   config:
     activate:
-      on-profile: cloud
+      on-profile: hybrid, cloud
 
 cds:
   security:
