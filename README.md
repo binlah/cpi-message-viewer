@@ -85,13 +85,40 @@ cd cpi-message-viewer
 mvn clean install
 ```
 
-### 2. Install UI dependencies
+### 2. Create service instances and destination on BTP subaccount. (required only for local testing)
 
-```bash
-npm install --prefix app/router
-```
+Create service instance for destination
 
-### 3. Local destination (required only for local testing)
+| Field | Value |
+|-------|-------|
+| Service | Destination Service |
+| Plan | lite |
+| Name | cpi-message-viewer-destination |
+| Service Key | app-key (create after instance is created) |
+
+Create service instance for Cloud Integration API ( or you can using existing instance if you've already created it. )
+
+| Field | Value |
+|-------|-------|
+| Service | SAP Process Integration Runtime |
+| Plan | api |
+| Name | it-rt_api |
+| Service Key | app-key (create after instance is created) |
+
+Create destination for Cloud Integration API
+
+| Field | Value |
+|-------|-------|
+| Name | BTP_CloudIntegration_API |
+| Authentication | OAuth2ClientCredentials |
+| Client ID | {{it-rt_api.app-key.clientid}} |
+| Client Secret | {{it-rt_api.app-key.clientsecret}} |
+| URL | {{it-rt_api.app-key.url}}/api/v1 |
+| Token Service URL | {{it-rt_api.app-key.tokenurl}}?grant_type=client_credentials |
+| HTML5.DynamicDestination | true |
+
+
+### 3. Local environment for testing
 
 Create `./default-env.json`:
 
@@ -106,19 +133,7 @@ Create `./default-env.json`:
                     "destination"
                 ],
                 "credentials": {
-					        ### copy from service key of destination instance ###
-                }
-            }
-        ],
-        "xsuaa": [
-            {
-                "label": "xsuaa",
-                "name": "xsuaa-service",
-                "tags": [
-                    "xsuaa"
-                ],
-                "credentials": {
-					        ### copy from service key of xsuaa instance  ###
+					### copy from cpi-message-viewer-destination.app-key ###
                 }
             }
         ]
@@ -126,33 +141,8 @@ Create `./default-env.json`:
 }
 ```
 
-Create `./app/router/default-env.json`:
-
-```json
-{
-  "destinations": [
-    {
-      "name": "srv-api",
-      "url": "http://localhost:8080",
-      "forwardAuthToken": true
-    }
-  ],
-  "VCAP_SERVICES": {
-    "xsuaa": [
-      ### copy from service key of xsuaa instance  ###
-    ]
-  }
-}
-```
-
 ### 4. Start CAP Java backend
 
-```bash
-mvn spring-boot:run "-Dspring-boot.run.profiles=local"
-```
-now, you can test access CAP service at http://localhost:8080/
-
-### 5. Start Fiori UI
 Change ./app/message-viewer/webapp/manifest.json to run test on local (don't forget to change it back before deployment)
 
 ```json
@@ -171,6 +161,22 @@ Change ./app/message-viewer/webapp/manifest.json to run test on local (don't for
 	....
 }
 ```
+
+we're ready!! run this command to start CAP service
+
+```bash
+mvn spring-boot:run "-Dspring-boot.run.profiles=local"
+```
+now, you can test access CAP service + Fiori UI at http://localhost:8080/ with this local credential 
+
+| Field | Value |
+|-------|-------|
+| user | binla |
+| pass | binla |
+
+you can change local credential in application.yaml
+
+### 5. Start Local AppRouter
 
 ```bash
 
