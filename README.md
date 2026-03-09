@@ -82,13 +82,13 @@ cpi-message-viewer/
 ```bash
 git clone https://github.com/binlah/cpi-message-viewer.git
 cd cpi-message-viewer
+mvn clean install
 ```
 
 ### 2. Install UI dependencies
 
 ```bash
-cd app/message-viewer
-npm install
+npm install --prefix app/router
 ```
 
 ### 3. Local destination (required only for local testing)
@@ -106,7 +106,7 @@ Create `./default-env.json`:
                     "destination"
                 ],
                 "credentials": {
-					        ### copy from destination instance / api service key ###
+					        ### copy from service key of destination instance ###
                 }
             }
         ],
@@ -118,7 +118,7 @@ Create `./default-env.json`:
                     "xsuaa"
                 ],
                 "credentials": {
-					        ### copy from xsuaa instance ###
+					        ### copy from service key of xsuaa instance  ###
                 }
             }
         ]
@@ -126,19 +126,58 @@ Create `./default-env.json`:
 }
 ```
 
+Create `./app/router/default-env.json`:
+
+```json
+{
+  "destinations": [
+    {
+      "name": "srv-api",
+      "url": "http://localhost:8080",
+      "forwardAuthToken": true
+    }
+  ],
+  "VCAP_SERVICES": {
+    "xsuaa": [
+      ### copy from service key of xsuaa instance  ###
+    ]
+  }
+}
+```
+
 ### 4. Start CAP Java backend
 
 ```bash
-cd srv
-mvn spring-boot:run
+mvn spring-boot:run "-Dspring-boot.run.profiles=local"
 ```
+now, you can test access CAP service at http://localhost:8080/
 
 ### 5. Start Fiori UI
+Change ./app/message-viewer/webapp/manifest.json to run test on local (don't forget to change it back before deployment)
+
+```json
+{
+	....
+    "dataSources": {
+      "mainService": {
+        "uri": "/odata/v4/remote/", ## add slash at the beginning of uri
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "odataVersion": "4.0"
+        }
+      }
+    },
+	....
+}
+```
 
 ```bash
-cd app/message-viewer
-npm start
+
+npx cds bind -2 {{xsuaa-service-instance-name}}:{{service-key-name}}
+npx cds bind --exec "npm start --prefix app/router"
 ```
+now, you can test access CAP Service + Fiori UI at http://localhost:5000/
 
 ---
 
@@ -154,7 +193,7 @@ ID: cpi-message-viewer.ext
 extends: cpi-message-viewer
 
 parameters:
-  subdomain: { { subdomain } }
+  subdomain: {{subdomain}}
 
 resources:
   - name: cpi-message-viewer-destination
