@@ -118,7 +118,7 @@ Create destination for Cloud Integration API
 | HTML5.DynamicDestination | true |
 
 
-### 3. Local environment for testing
+### 3. Set local environment for testing
 
 Create `./default-env.json`:
 
@@ -176,14 +176,114 @@ now, you can test access CAP service + Fiori UI at http://localhost:8080/ with t
 
 you can change local credential in application.yaml
 
-### 5. Start Local AppRouter
+# 🏃 Running Hybrid
+
+### 5. Create XSUAA service instance with Role Collection
 
 ```bash
 
-npx cds bind -2 {{xsuaa-service-instance-name}}:{{service-key-name}}
-npx cds bind --exec "npm start --prefix app/router"
+cf api {API Endpoint}
+cf login --sso
+cf create-service xsuaa application cpi-message-viewer-auth -c xs-security.json
+cf create-service-key cpi-message-viewer-auth app-key
 ```
-now, you can test access CAP Service + Fiori UI at http://localhost:5000/
+
+These command will create XSUAA service instance, service key and Roles 'MessageViewer' in subaccount.
+
+now, manually create Role Collection 'cpi-message-viewer' with following information.
+
+Roles 
+| Field | Value |
+|-------|-------|
+| Role Name | MessageViewer |
+| Role Template | MessageViewer |
+| Application Identifier | cpi-message-viewer!XXXXXX |
+
+Users 
+| Field | Value |
+|-------|-------|
+| ID | your email |
+| Identity Provider | Default identity provider |
+| E-Mail | your email |
+
+
+### 6. Set hybrid environment for testing
+
+Edit `./default-env.json`:
+
+```json
+{
+    "VCAP_SERVICES": {
+        "destination": [
+            {
+                "label": "destination",
+                "name": "destination-service",
+                "tags": [
+                    "destination"
+                ],
+                "credentials": {
+					### copy from cpi-message-viewer-destination.app-key ###
+                }
+            }
+        ],
+        "xsuaa": [
+            {
+                "label": "xsuaa",
+                "name": "xsuaa-service",
+                "tags": [
+                    "xsuaa"
+                ],
+                "credentials": {
+					### copy from cpi-message-viewer-auth.app-key ###
+				}
+            }
+        ]
+    }
+}
+```
+
+Create `./app/router/default-env.json`:
+
+```json
+{
+  "destinations": [
+    {
+      "name": "srv-api",
+      "url": "http://localhost:8080",
+      "forwardAuthToken": true
+    }
+  ],
+  "VCAP_SERVICES": {
+    "xsuaa": [
+      {
+        "label": "xsuaa",
+        "name": "xsuaa-service",
+        "tags": [
+          "xsuaa"
+        ],
+        "credentials": {
+			### copy from cpi-message-viewer-auth.app-key ###
+		}
+      }
+    ]
+  }
+}
+```
+
+run following command in terminal 1
+
+```bash
+mvn spring-boot:run "-Dspring-boot.run.profiles=hybrid"
+```
+
+run following command in terminal 2
+
+```bash
+npm install --prefix app/router # this command should be run only first time.
+npm start --prefix app/router
+```
+
+now, you can test access CAP Service + Fiori UI at http://localhost:5000/ . it should redirect you to login page then after login, you should able to access CAP service and Fiori UI.
 
 ---
 
@@ -204,10 +304,10 @@ parameters:
 resources:
   - name: cpi-message-viewer-destination
     parameters:
-      btp-api-url: '{{url-from-service-key-plan-api}}'
-      btp-api-client-id: '{{clientid-from-service-key-plan-api}}'
-      btp-api-client-secret: '{{clientsecret-from-service-key-plan-api}}'
-      btp-api-token-url: '{{tokenurl-from-service-key-plan-api}}'
+      btp-api-url: '{{it-rt_api.app-key.url}}'
+      btp-api-client-id: '{{it-rt_api.app-key.clientid}}'
+      btp-api-client-secret: '{{it-rt_api.app-key.clientsecret}}'
+      btp-api-token-url: '{{it-rt_api.app-key.tokenurl}}'
 ```
 
 ## 2. Deploy using extension file
