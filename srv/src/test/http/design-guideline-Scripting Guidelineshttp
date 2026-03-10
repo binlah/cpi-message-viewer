@@ -1,0 +1,39 @@
+# In the following requests the variable $dotenv btp_baseUrl is used.
+# Its value is set here.
+
+
+######################## MPLCustom Header ########################
+### Fetch CSRF Token
+# @name login
+HEAD {{$dotenv btp_iflow_base_url}}/http/Scripting/MPLCustomHeader
+Authorization: Basic {{$dotenv btp_iflow_client_id}}:{{$dotenv btp_iflow_client_secret}}
+x-csrf-token: fetch
+
+@x-csrf-token = {{login.response.headers.x-csrf-token}}
+
+### post data
+POST {{$dotenv btp_iflow_base_url}}/http/Scripting/MPLCustomHeader
+Authorization: Basic {{$dotenv btp_iflow_client_id}}:{{$dotenv btp_iflow_client_secret}}
+content-type: application/xml
+x-csrf-token: {{x-csrf-token}}
+
+<order>
+<sender>SenderSystem</sender>
+<receiver>ReceiverSystem</receiver>
+<messagetype>MessageTypeA</messagetype>
+<messageID>AABBCCDD</messageID>
+<po_number>12345</po_number>
+<productID>123</productID>
+</order>
+
+
+######################## PersistMessage ########################
+### post data
+POST {{$dotenv btp_iflow_base_url}}/http/ModelingBasics/PersistMessage
+Authorization: Basic {{$dotenv btp_iflow_client_id}}:{{$dotenv btp_iflow_client_secret}}
+content-type: application/xml
+# x-csrf-token: {{x-csrf-token}}
+
+<message>
+    <productId>HT-1000</productId>
+</message>
