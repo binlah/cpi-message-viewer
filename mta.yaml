@@ -3,10 +3,10 @@ ID: cpi-message-viewer
 version: 1.0.0-SNAPSHOT
 description: "A CPI Message Viewer project."
 parameters:
-  enable-parallel-deployments: true
+  enable-parallel-deployments: false
   deploy_mode: html5-repo
   subdomain: ~
-  srv-no-route: ~
+  # srv-no-route: ~
 modules:
   - name: cpi-message-viewer-srv
     type: java
