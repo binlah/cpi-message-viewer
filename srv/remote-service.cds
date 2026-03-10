@@ -20,8 +20,8 @@ service RemoteService @(path: '/remote') {
             CorrelationId,
             // LogStart               : DateTime,
             // LogEnd                 : DateTime,
-            LogStart                : Timestamp,
-            LogEnd                  : Timestamp,
+            LogStart                     : Timestamp,
+            LogEnd                       : Timestamp,
             // IntegrationFlowName,
             Status,
             IntegrationArtifact,
@@ -36,15 +36,21 @@ service RemoteService @(path: '/remote') {
             @Core.Computed                             : true
             @Capabilities.FilterRestrictions.Filterable: true
             // @UI.Hidden                                 : true
-            virtual customHeaderKV  : String,
+            virtual customHeaderKV       : String,
+
+            // Optional single-box variant: users type "key=value"
+            @Core.Computed                             : true
+            @Capabilities.FilterRestrictions.Filterable: true
+            // @UI.Hidden                                 : true
+            virtual IntegrationPackageId : String,
 
             @Core.Computed                             : true
             @Capabilities.FilterRestrictions.Filterable: true
-            virtual BeginSearchTime : Timestamp,
+            virtual BeginSearchTime      : Timestamp,
 
             @Core.Computed                             : true
             @Capabilities.FilterRestrictions.Filterable: true
-            virtual EndSearchTime   : Timestamp
+            virtual EndSearchTime        : Timestamp
         };
 
     @cds.persistence.skip
@@ -95,6 +101,35 @@ service RemoteService @(path: '/remote') {
             DeployedBy,
             DeployedOn,
             Status,
+        };
+
+    @cds.persistence.skip
+    @Capabilities.InsertRestrictions.Insertable: false
+    @Capabilities.UpdateRestrictions.Updatable : false
+    @Capabilities.DeleteRestrictions.Deletable : false
+    @Capabilities.Countable                    : false
+    entity IntegrationPackages                        as
+        projection on extIc.IntegrationPackages {
+            Id,
+            Name,
+            Description,
+            ShortText,
+            Version,
+            Vendor,
+            Mode,
+            SupportedPlatform,
+            ModifiedBy,
+            CreationDate,
+            ModifiedDate,
+            CreatedBy,
+            Products,
+            Keywords,
+            Countries,
+            Industries,
+            LineOfBusiness,
+            IntegrationDesigntimeArtifacts,
+            ValueMappingDesigntimeArtifacts,
+            MessageMappingDesigntimeArtifacts
         };
 
     annotate RemoteService.MessageProcessingLogs with @Capabilities.SearchRestrictions: {Searchable: false};

@@ -42,8 +42,10 @@ public class MessageProcessingLogCqnVisitor implements CqnVisitor {
     private MessageProcessingLogFluentHelper fluentHelper;
     private ExpressionFluentHelper<MessageProcessingLog> mainFilter;
     private ExpressionFluentHelper<MessageProcessingLog> integrationArtifactIdFilter;
+    private ExpressionFluentHelper<MessageProcessingLog> integrationPackageIdFilter;
 
     private String filterCustomHeaderProperties;
+    // private String IntegrationPackageId;
 
     // public MessageProcessingLogCqnVisitor() {
     // }
@@ -74,6 +76,10 @@ public class MessageProcessingLogCqnVisitor implements CqnVisitor {
 
         // Extract WHERE clause
         // select.where().ifPresent(predicate -> predicate.accept(this));
+
+        mainFilter = (integrationPackageIdFilter != null)
+                ? ((mainFilter == null) ? integrationPackageIdFilter : mainFilter.and(integrationPackageIdFilter))
+                : mainFilter;
 
         mainFilter = (integrationArtifactIdFilter != null)
                 ? ((mainFilter == null) ? integrationArtifactIdFilter : mainFilter.and(integrationArtifactIdFilter))
@@ -168,6 +174,15 @@ public class MessageProcessingLogCqnVisitor implements CqnVisitor {
                             ? MessageProcessingLog.field("IntegrationArtifact/Id", String.class).eq(value.toString())
                             : integrationArtifactIdFilter
                                     .or(MessageProcessingLog.field("IntegrationArtifact/Id", String.class)
+                                            .eq(value.toString()));
+
+                } else if (fieldName.equals("IntegrationPackageId")) {
+
+                    integrationPackageIdFilter = (integrationPackageIdFilter == null)
+                            ? MessageProcessingLog.field("IntegrationArtifact/PackageId", String.class)
+                                    .eq(value.toString())
+                            : integrationPackageIdFilter
+                                    .or(MessageProcessingLog.field("IntegrationArtifact/PackageId", String.class)
                                             .eq(value.toString()));
 
                 } else if (fieldName.equals("BeginSearchTime")) {

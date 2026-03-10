@@ -65,21 +65,17 @@ annotate service.MessageProcessingLogs with @(
         {
             $Type: 'UI.DataField',
             Value: IntegrationArtifact_Name,
-            Label: 'IntegrationArtifact_Name',
+            Label: '{i18n>IntegrationArtifact}',
         },
         {
             $Type: 'UI.DataField',
-            Label: 'LogStart',
+            Label: '{i18n>LogStart}',
             Value: LogStart,
         },
         {
             $Type: 'UI.DataField',
-            Label: 'LogEnd',
+            Label: '{i18n>LogEnd}',
             Value: LogEnd,
-        },
-        {
-            $Type: 'UI.DataField',
-            Value: Status,
         },
         {
             $Type: 'UI.DataField',
@@ -87,21 +83,26 @@ annotate service.MessageProcessingLogs with @(
         },
         {
             $Type: 'UI.DataField',
-            Label: 'MessageGuid',
+            Value: Status,
+        },
+        {
+            $Type: 'UI.DataField',
+            Label: '{i18n>MessageId}',
             Value: MessageGuid,
         },
         {
             $Type: 'UI.DataField',
             Value: CorrelationId,
-            Label: 'CorrelationId',
+            Label: '{i18n>CorrelationId}',
         },
     ],
     UI.SelectionFields           : [
+        IntegrationPackageId,
         IntegrationArtifact_Id,
+        customHeaderKV,
         BeginSearchTime,
         EndSearchTime,
         CustomStatus,
-        customHeaderKV,
         MessageGuid,
         CorrelationId,
         Status,
@@ -168,6 +169,22 @@ annotate service.MessageStoreEntries with @(
     },
 );
 
+annotate service.MessageProcessingLogs with {
+    IntegrationPackageId @(
+        Common.Label                   : '{i18n>IntegrationPackage}',
+        Common.ValueList               : {
+            $Type         : 'Common.ValueListType',
+            CollectionPath: 'IntegrationPackages',
+            Parameters    : [{
+                $Type            : 'Common.ValueListParameterInOut',
+                LocalDataProperty: IntegrationPackageId,
+                ValueListProperty: 'Id',
+            }, ],
+        },
+        Common.ValueListWithFixedValues: true,
+    )
+};
+
 annotate service.MessageProcessingLogs : IntegrationArtifact.Id with @(
     Common.Label                   : '{i18n>IntegrationArtifact}',
     Common.Text                    : IntegrationArtifact_Name,
@@ -188,11 +205,11 @@ annotate service.MessageProcessingLogs with {
 };
 
 annotate service.MessageProcessingLogs with {
-    LogStart @Common.Label: 'LogStart'
+    LogStart @Common.Label: '{i18n>LogStart}'
 };
 
 annotate service.MessageProcessingLogs with {
-    LogEnd @Common.Label: 'LogEnd'
+    LogEnd @Common.Label: '{i18n>LogEnd}'
 };
 
 annotate service.MessageProcessingLogs with {
@@ -244,3 +261,17 @@ annotate RemoteService.MessageProcessingLogs with @(Capabilities: {FilterRestric
         AllowedExpressions: 'SingleValue'
     }
 ]}});
+
+annotate service.IntegrationPackages with {
+    Id @(
+        Common.Text                    : Name,
+        Common.Text.@UI.TextArrangement: #TextOnly,
+    )
+};
+
+annotate service.IntegrationRuntimeArtifacts with {
+    Id @(
+        Common.Text                    : Name,
+        Common.Text.@UI.TextArrangement: #TextOnly,
+    )
+};

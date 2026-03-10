@@ -1,0 +1,34 @@
+# In the following requests the variable $dotenv btp_baseUrl is used.
+# Its value is set here.
+
+
+######################## FirstFlowWithSenderChannel ########################
+### Fetch CSRF Token
+# @name login
+GET {{$dotenv btp_iflow_base_url}}/http/ModelingBasics/FirstFlowWithSenderChannel
+Authorization: Basic {{$dotenv btp_iflow_client_id}}:{{$dotenv btp_iflow_client_secret}}
+x-csrf-token: fetch
+
+@x-csrf-token = {{login.response.headers.x-csrf-token}}
+
+### post data
+POST {{$dotenv btp_iflow_base_url}}/http/ModelingBasics/FirstFlowWithSenderChannel
+Authorization: Basic {{$dotenv btp_iflow_client_id}}:{{$dotenv btp_iflow_client_secret}}
+content-type: application/json
+x-csrf-token: {{x-csrf-token}}
+
+{
+	"productIdentifier": "HT-1081"
+}
+
+
+######################## PersistMessage ########################
+### post data
+POST {{$dotenv btp_iflow_base_url}}/http/ModelingBasics/PersistMessage
+Authorization: Basic {{$dotenv btp_iflow_client_id}}:{{$dotenv btp_iflow_client_secret}}
+content-type: application/xml
+# x-csrf-token: {{x-csrf-token}}
+
+<message>
+    <productId>HT-1000</productId>
+</message>

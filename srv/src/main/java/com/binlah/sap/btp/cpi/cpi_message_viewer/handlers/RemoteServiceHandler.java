@@ -19,8 +19,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import com.binlah.sap.btp.cpi.cpi_message_viewer.cqn.IntegrationPackagesCqnVisitor;
 import com.binlah.sap.btp.cpi.cpi_message_viewer.cqn.IntegrationRuntimeArtifactsCqnVisitor;
 import com.binlah.sap.btp.cpi.cpi_message_viewer.cqn.MessageProcessingLogCqnVisitor;
+import com.binlah.sap.cap.vdm.namespaces.integrationcontent.IntegrationPackage;
+import com.binlah.sap.cap.vdm.namespaces.integrationcontent.IntegrationPackageFluentHelper;
 import com.binlah.sap.cap.vdm.namespaces.integrationcontent.IntegrationRuntimeArtifact;
 import com.binlah.sap.cap.vdm.namespaces.integrationcontent.IntegrationRuntimeArtifactFluentHelper;
 import com.binlah.sap.cap.vdm.namespaces.messageprocessinglogs.IntegrationArtifact;
@@ -52,6 +55,7 @@ import com.sap.cloud.sdk.datamodel.odata.client.request.ODataRequestReadByKey;
 import com.sap.cloud.sdk.datamodel.odata.client.request.ODataRequestResultGeneric;
 import com.sap.cloud.sdk.datamodel.odata.helper.FluentHelperCount;
 
+import cds.gen.remoteservice.IntegrationPackages_;
 import cds.gen.remoteservice.IntegrationRuntimeArtifacts_;
 import cds.gen.remoteservice.MessageProcessingLogCustomHeaderProperties_;
 import cds.gen.remoteservice.MessageProcessingLogs_;
@@ -516,6 +520,66 @@ public class RemoteServiceHandler implements EventHandler {
         m.put("DeployedBy", e.getDeployedBy());
         m.put("DeployedOn", e.getDeployedOn());
         m.put("Status", e.getStatus());
+        return m;
+    }
+
+    // --------------------------------------------------------------------
+    // ----------------------- IntegrationPackages -----------------------
+    // --------------------------------------------------------------------
+
+    @On(event = CqnService.EVENT_READ, entity = IntegrationPackages_.CDS_NAME)
+    public void onReadIntegrationPackages(final CdsReadEventContext ctx) {
+        logger.info("Starting onReadIntegrationPackages");
+        logger.info(" with CQN: {}", ctx.getCqn());
+
+        final CqnSelect select = ctx.getCqn();
+
+        IntegrationPackageFluentHelper fluentHelper = this.integrationContentService
+                .getAllIntegrationPackage();
+
+        IntegrationPackagesCqnVisitor visitor = new IntegrationPackagesCqnVisitor(fluentHelper);
+        select.accept(visitor);
+
+        @SuppressWarnings("null")
+        final List<IntegrationPackage> entities = fluentHelper.executeRequest(getDestination());
+        // final FluentHelperCount fluentHelperCount = fluentHelper.count();
+        // @SuppressWarnings("null")
+        // final long count = fluentHelperCount.executeRequest(getDestination());
+        final long count = entities.size();
+
+        ctx.setResult(ResultBuilder.selectedRows(
+                mapIntegrationPackageToRows(entities)).inlineCount(count).result());
+    }
+
+    private List<Map<String, Object>> mapIntegrationPackageToRows(List<IntegrationPackage> vdmList) {
+        List<Map<String, Object>> rows = new ArrayList<>();
+
+        vdmList.stream().forEach(vdm -> {
+            rows.add(mapIntegrationPackageRow(vdm));
+        });
+
+        return rows;
+    }
+
+    private Map<String, Object> mapIntegrationPackageRow(final IntegrationPackage e) {
+        final Map<String, Object> m = new HashMap<>();
+        m.put("Id", e.getId());
+        m.put("Name", e.getName());
+        m.put("Description", e.getDescription());
+        m.put("ShortText", e.getShortText());
+        m.put("Version", e.getVersion());
+        m.put("Vendor", e.getVendor());
+        m.put("Mode", e.getMode());
+        m.put("SupportedPlatform", e.getSupportedPlatform());
+        m.put("ModifiedBy", e.getModifiedBy());
+        m.put("CreationDate", e.getCreationDate());
+        m.put("ModifiedDate", e.getModifiedDate());
+        m.put("CreatedBy", e.getCreatedBy());
+        m.put("Products", e.getProducts());
+        m.put("Keywords", e.getKeywords());
+        m.put("Countries", e.getCountries());
+        m.put("Industries", e.getIndustries());
+        m.put("LineOfBusiness", e.getLineOfBusiness());
         return m;
     }
 

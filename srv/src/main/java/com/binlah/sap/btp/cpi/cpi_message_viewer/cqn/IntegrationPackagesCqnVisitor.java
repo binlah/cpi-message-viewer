@@ -6,20 +6,16 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.binlah.sap.cap.vdm.namespaces.integrationcontent.IntegrationRuntimeArtifact;
-import com.binlah.sap.cap.vdm.namespaces.integrationcontent.IntegrationRuntimeArtifactFluentHelper;
+import com.binlah.sap.cap.vdm.namespaces.integrationcontent.IntegrationPackageFluentHelper;
 import com.sap.cds.ql.cqn.CqnComparisonPredicate;
 import com.sap.cds.ql.cqn.CqnSelect;
 import com.sap.cds.ql.cqn.CqnVisitor;
-import com.sap.cloud.sdk.datamodel.odata.helper.ExpressionFluentHelper;
-import com.sap.cloud.sdk.datamodel.odata.helper.Order;
 
-public class IntegrationRuntimeArtifactsCqnVisitor implements CqnVisitor {
+public class IntegrationPackagesCqnVisitor implements CqnVisitor {
 
-    private static final Logger logger = LoggerFactory.getLogger(IntegrationRuntimeArtifactsCqnVisitor.class);
+    private static final Logger logger = LoggerFactory.getLogger(IntegrationPackagesCqnVisitor.class);
 
-    private IntegrationRuntimeArtifactFluentHelper fluentHelper;
-    private ExpressionFluentHelper<IntegrationRuntimeArtifact> mainFilter;
+    private IntegrationPackageFluentHelper fluentHelper;
 
     private String entityName;
     private List<String> selectFields = new ArrayList<>();
@@ -27,10 +23,7 @@ public class IntegrationRuntimeArtifactsCqnVisitor implements CqnVisitor {
     private Integer skip;
     private boolean count;
 
-    private String[] interestedType = new String[] { "REST_API_PROVIDER", "SOAP_API_PROVIDER", "INTEGRATION_FLOW",
-            "ODATA_SERVICE" };
-
-    public IntegrationRuntimeArtifactsCqnVisitor(IntegrationRuntimeArtifactFluentHelper fluentHelper) {
+    public IntegrationPackagesCqnVisitor(IntegrationPackageFluentHelper fluentHelper) {
         this.fluentHelper = fluentHelper;
     }
 
@@ -54,16 +47,6 @@ public class IntegrationRuntimeArtifactsCqnVisitor implements CqnVisitor {
             logger.debug(" > Select fields: " + selectFields);
         }
 
-        for (String type : interestedType) {
-            mainFilter = (mainFilter == null)
-                    ? IntegrationRuntimeArtifact.TYPE_2.eq(type)
-                    : mainFilter.or(IntegrationRuntimeArtifact.TYPE_2.eq(type));
-        }
-
-        if (mainFilter != null) {
-            fluentHelper = fluentHelper.filter(mainFilter);
-        }
-
         // Extract TOP (limit)
         long topValue = select.top();
         top = (int) topValue;
@@ -85,9 +68,6 @@ public class IntegrationRuntimeArtifactsCqnVisitor implements CqnVisitor {
             logger.debug(" > Order By: " + orderItem);
 
         });
-
-        fluentHelper = fluentHelper.orderBy(IntegrationRuntimeArtifact.ID,
-                Order.ASC);
 
         // Check if count is requested
         count = select.hasInlineCount();
