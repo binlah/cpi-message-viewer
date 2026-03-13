@@ -29,3 +29,28 @@ Authorization: Bearer {{access_token}}
 ### List All MessageProcessingLogs
 GET {{$dotenv btp_api_base_url}}/MessageProcessingLogs?$format=json
 Authorization: Bearer {{access_token}}
+
+#------------------------------------- MessageProcessingLogs -------------------------------------
+
+@MessageGuid = <<MessageGuid from your system>>
+
+### Get MessageProcessingLogs by MessageGuid
+GET {{$dotenv btp_api_base_url}}/MessageProcessingLogs('{{MessageGuid}}')?$format=json
+Authorization: Bearer {{access_token}}
+
+#------------------------------------- MessageStoreEntries -------------------------------------
+
+### List All MessageStoreEntries
+# @name MPLByGuid
+GET {{$dotenv btp_api_base_url}}/MessageProcessingLogs('{{MessageGuid}}')/MessageStoreEntries?$format=json
+Authorization: Bearer {{access_token}}
+
+@MessageStoreEntryId = {{MPLByGuid.response.body.d.results[0].Id}}
+
+### Get MessageStoreEntries by MessageStoreEntryId
+GET {{$dotenv btp_api_base_url}}/MessageStoreEntries('{{MessageStoreEntryId}}')?$format=json
+Authorization: Bearer {{access_token}}
+
+### Get MessageStoreEntries value by MessageStoreEntryId
+GET {{$dotenv btp_api_base_url}}/MessageStoreEntries('{{MessageStoreEntryId}}')/$value
+Authorization: Bearer {{access_token}}
