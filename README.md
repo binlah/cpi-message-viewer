@@ -104,6 +104,7 @@ Create service instance for Cloud Integration API ( or you can using existing in
 | Plan | api |
 | Name | it-rt_api |
 | Service Key | app-key (create after instance is created) |
+| Roles | MonitoringDataRead, MessagePayloadsRead, WorkspacePackagesRead |
 
 Create destination for Cloud Integration API
 
