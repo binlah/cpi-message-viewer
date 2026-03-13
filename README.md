@@ -87,6 +87,16 @@ mvn clean install
 
 ### 2. Create service instances and destination on BTP subaccount. (required only for local testing)
 
+Create service instance for Cloud Integration API ( or you can using existing instance if you've already created it. )
+
+| Field | Value |
+|-------|-------|
+| Service | SAP Process Integration Runtime |
+| Plan | api |
+| Name | it-rt_api |
+| Roles | MonitoringDataRead, MessagePayloadsRead, WorkspacePackagesRead |
+| Service Key | app-key (create after instance is created) |
+
 Create service instance for destination
 
 | Field | Value |
@@ -95,16 +105,6 @@ Create service instance for destination
 | Plan | lite |
 | Name | cpi-message-viewer-destination |
 | Service Key | app-key (create after instance is created) |
-
-Create service instance for Cloud Integration API ( or you can using existing instance if you've already created it. )
-
-| Field | Value |
-|-------|-------|
-| Service | SAP Process Integration Runtime |
-| Plan | api |
-| Name | it-rt_api |
-| Service Key | app-key (create after instance is created) |
-| Roles | MonitoringDataRead, MessagePayloadsRead, WorkspacePackagesRead |
 
 Create destination for Cloud Integration API
 
